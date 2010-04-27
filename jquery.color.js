@@ -37,9 +37,9 @@
                 fx.colorInit = true;
             }
 
-            tuples.push( Math.max(Math.min( parseInt( (fx.pos * (fx.end[0] - fx.start[0])) + fx.start[0]), 255), 0) ); // R
-            tuples.push( Math.max(Math.min( parseInt( (fx.pos * (fx.end[1] - fx.start[1])) + fx.start[1]), 255), 0) ); // G
-            tuples.push( Math.max(Math.min( parseInt( (fx.pos * (fx.end[2] - fx.start[2])) + fx.start[2]), 255), 0) ); // B
+            tuples.push( Math.max(Math.min( parseInt( (fx.pos * (fx.end[0] - fx.start[0])) + fx.start[0], 10), 255), 0) ); // R
+            tuples.push( Math.max(Math.min( parseInt( (fx.pos * (fx.end[1] - fx.start[1])) + fx.start[1], 10), 255), 0) ); // G
+            tuples.push( Math.max(Math.min( parseInt( (fx.pos * (fx.end[2] - fx.start[2])) + fx.start[2], 10), 255), 0) ); // B
 
             if ( fx.colorModel == 'rgba' ) {
                 // Alpha
@@ -78,7 +78,7 @@
 
         // Look for rgb[a](num,num,num[,num])
         if (result = rrgbdecimal.exec(color)) {
-            ret = [parseInt(result[2]), parseInt(result[3]), parseInt(result[4])];
+            ret = [parseInt(result[2], 10), parseInt(result[3], 10), parseInt(result[4], 10)];
             // is rgba?
             if (result[1] && result[5]) {
                 ret.push(parseFloat(result[5]));
