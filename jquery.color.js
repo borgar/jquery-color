@@ -28,11 +28,8 @@
                 if ( !fx.alphavalue.end ) {
                     fx.end.push( 1 );
                 }
-                if ( jQuery.support.rgba &&
-                     (!fx.alphavalue.start && fx.alphavalue.end) || // RGB => RGBA
-                     (fx.alphavalue.start && fx.alphavalue.end)  || // RGBA => RGBA
-                     (fx.alphavalue.start && !fx.alphavalue.end)    // RGBA => RGB
-                ) {
+                // RGB => RGBA, RGBA => RGBA, RGBA => RGB
+                if ( jQuery.support.rgba && ( fx.alphavalue.start || fx.alphavalue.end ) ) {
                     fx.colorModel = 'rgba';
                 } else {
                     fx.colorModel = 'rgb';
@@ -102,7 +99,7 @@
         }
 
         // Otherwise, we're most likely dealing with a named color
-        return colors[jQuery.trim(color).toLowerCase()];
+        return colors[jQuery.trim(color).toLowerCase()].concat();
     }
 
     function getColor(elem, attr) {
