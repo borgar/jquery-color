@@ -18,22 +18,13 @@
             if ( !fx.colorInit ) {
                 fx.start = getColor( fx.elem, attr );
                 fx.end = getRGB( fx.end );
-                fx.alphavalue = {
-                    start: 4 === fx.start.length,
-                    end:   4 === fx.end.length
-                };
-                if ( !fx.alphavalue.start ) {
-                    fx.start.push( 1 );
+                if ( fx.start.length !== 4 ) {
+                    fx.start[3] = 1;
                 }
-                if ( !fx.alphavalue.end ) {
-                    fx.end.push( 1 );
+                if ( fx.end.length !== 4 ) {
+                    fx.end[3] = 1;
                 }
-                // RGB => RGBA, RGBA => RGBA, RGBA => RGB
-                if ( jQuery.support.rgba && ( fx.alphavalue.start || fx.alphavalue.end ) ) {
-                    fx.colorModel = 'rgba';
-                } else {
-                    fx.colorModel = 'rgb';
-                }
+                fx.colorModel = jQuery.support.rgba ? 'rgba' : 'rgb';
                 fx.colorInit = true;
             }
 
@@ -41,8 +32,7 @@
             tuples.push( Math.max(Math.min( parseInt( (fx.pos * (fx.end[1] - fx.start[1])) + fx.start[1], 10), 255), 0) ); // G
             tuples.push( Math.max(Math.min( parseInt( (fx.pos * (fx.end[2] - fx.start[2])) + fx.start[2], 10), 255), 0) ); // B
 
-            if ( fx.colorModel == 'rgba' ) {
-                // Alpha
+            if ( fx.colorModel == 'rgba' ) { // Alpha
                 tuples.push( Math.max(Math.min( parseFloat((fx.pos * (fx.end[3] - fx.start[3])) + fx.start[3]), 1), 0).toFixed(2) );
             }
 
