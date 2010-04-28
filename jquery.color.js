@@ -55,52 +55,46 @@
     // http://jquery.offput.ca/highlightFade/
 
     // Parse strings looking for color tuples [255,255,255[,1]]
-    function getRGB(color) {
-        var result, ret,
-            ralpha = '(?:,\\s*((?:1|0)(?:\\.0+)?|(?:0?\\.[0-9]+))\\s*)?\\)',
-            rrgbdecimal = new RegExp( 'rgb(a)?\\(\\s*([0-9]{1,3})\\s*,\\s*([0-9]{1,3})\\s*,\\s*([0-9]{1,3})\\s*' + ralpha ),
-            rrgbpercent = new RegExp( 'rgb(a)?\\(\\s*([0-9]+(?:\\.[0-9]+)?)\\%\\s*,\\s*([0-9]+(?:\\.[0-9]+)?)\\%\\s*,\\s*([0-9]+(?:\\.[0-9]+)?)\\%\\s*' + ralpha );
+    function getRGB ( color ) {
+        var ret, rgb;
 
         // Check if we're already dealing with an array of colors
-        if ( color && color.constructor == Array && color.length >= 3 && color.length <= 4 ) {
+        if ( $.isArray( color ) && ( color.length === 4 || color.length === 3 ) ) {
             return color;
         }
 
-        // Look for #a0b1c2
-        if (result = /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.exec(color)) {
-            return [parseInt(result[1],16), parseInt(result[2],16), parseInt(result[3],16)];
-        }
+        color = color.replace( /\s+/g, '' );
 
-        // Look for #fff
-        if (result = /#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])/.exec(color)) {
-            return [parseInt(result[1]+result[1],16), parseInt(result[2]+result[2],16), parseInt(result[3]+result[3],16)];
-        }
-
-        // Look for rgb[a](num,num,num[,num])
-        if (result = rrgbdecimal.exec(color)) {
-            ret = [parseInt(result[2], 10), parseInt(result[3], 10), parseInt(result[4], 10)];
-            // is rgba?
-            if (result[1] && result[5]) {
-                ret.push(parseFloat(result[5]));
+        // Look for #a0b1c2, #fff
+        if ( rgb = /^#(?=.{3,6}$)([a-f\d]{1,2})([a-f\d]{1,2})([a-f\d]{1,2})$/i.exec( color ) ) {
+            ret = [ parseInt( rgb[1], 16 ), 
+                    parseInt( rgb[2], 16 ),
+                    parseInt( rgb[3], 16 ) ];
+            if ( rgb[0].length === 4 ) {
+                ret = $.map(ret, function ( m ) { return m * 17; });
             }
-
             return ret;
         }
 
-        // Look for rgb[a](num%,num%,num%[,num])
-        if (result = rrgbpercent.exec(color)) {
-            ret = [parseFloat(result[2]) * 2.55, parseFloat(result[3]) * 2.55, parseFloat(result[4]) * 2.55];
-            // is rgba?
-            if (result[1] && result[5]) {
-                ret.push(parseFloat(result[5]));
+        // Look for rgb[a](num,num,num[,num]) / rgb[a](num%,num%,num%[,num])
+        var rgb = /^rgb(a?)\((\d+)(%?),(\d+)(%?),(\d+)(%?)(?:,(1(?:\.00?)?|0?\.\d+))?\)$/.exec( color );
+        if ( rgb && ( rgb[3] === rgb[5] && rgb[3] === rgb[7] ) && !(!rgb[1] && rgb[8]) ) {
+            var ret = [ parseInt( rgb[2], 10 ),
+                        parseInt( rgb[4], 10 ),
+                        parseInt( rgb[6], 10 ) ];
+            if ( rgb[3] === '%' ) {
+                ret = $.map(ret, function ( m ) { return m * 255 / 100; });
             }
-
+            if ( rgb[1] && rgb[8] ) {
+                ret.push( parseFloat( rgb[8] ) );
+            }
             return ret;
         }
 
-        // Otherwise, we're most likely dealing with a named color
-        return colors[jQuery.trim(color).toLowerCase()].concat();
+        // Are we dealing with a named color?
+        return ( colors[ color ] || colors[ 'transparent' ] ).concat();
     }
+
 
     function getColor(elem, attr) {
         var color;
