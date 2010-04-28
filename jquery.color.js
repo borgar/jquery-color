@@ -113,19 +113,9 @@
     };
 
     function supportsRGBA() {
-        var $script = jQuery('script:first'),
-            color = $script.css('color'),
-            result = false;
-        if (/^rgba/.test(color)) {
-                result = true;
-        } else {
-            try {
-                result = ( color != $script.css('color', 'rgba(0, 0, 0, 0.5)').css('color') );
-                $script.css('color', color);
-            } catch (e) {};
-        }
-
-        return result;
+        var s = jQuery('<div/>')[0].style;
+        s.cssText = 'color:rgba(1,2,3,.5)';
+        return s.color.indexOf( 'rgba' ) !== -1;
     };
 
     // Some named colors to work with
