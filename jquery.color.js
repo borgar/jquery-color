@@ -46,7 +46,7 @@
 
     // Parse strings looking for color tuples [255,255,255[,1]]
     function getRGB ( color ) {
-        var ret, rgb;
+        var ret, rgb, mul;
 
         // Check if we're already dealing with an array of colors
         if ( $.isArray( color ) && ( color.length === 4 || color.length === 3 ) ) {
@@ -56,25 +56,21 @@
         color = color.replace( /\s+/g, '' );
 
         // Look for #a0b1c2, #fff
-        if ( rgb = /^#(?=.{3,6}$)([a-f\d]{1,2})([a-f\d]{1,2})([a-f\d]{1,2})$/i.exec( color ) ) {
-            ret = [ parseInt( rgb[1], 16 ), 
-                    parseInt( rgb[2], 16 ),
-                    parseInt( rgb[3], 16 ) ];
-            if ( rgb[0].length === 4 ) {
-                ret = $.map(ret, function ( m ) { return m * 17; });
-            }
+        if ( rgb = /^#(?=(?:...){1,2}$)([a-f\d]{1,2})([a-f\d]{1,2})([a-f\d]{1,2})$/i.exec( color ) ) {
+            mul = ( rgb[0].length === 4 ) ? 17 : 1;
+            ret = [ parseInt( rgb[1], 16 ) * mul, 
+                    parseInt( rgb[2], 16 ) * mul,
+                    parseInt( rgb[3], 16 ) * mul ];
             return ret;
         }
 
         // Look for rgb[a](num,num,num[,num]) / rgb[a](num%,num%,num%[,num])
-        var rgb = /^rgb(a?)\((\d+)(%?),(\d+)(%?),(\d+)(%?)(?:,(1(?:\.00?)?|0?\.\d+))?\)$/.exec( color );
+        rgb = /^rgb(a?)\((\d+)(%?),(\d+)(%?),(\d+)(%?)(?:,(1(?:\.00?)?|0?\.\d+))?\)$/.exec( color );
         if ( rgb && ( rgb[3] === rgb[5] && rgb[3] === rgb[7] ) && !(!rgb[1] && rgb[8]) ) {
-            var ret = [ parseInt( rgb[2], 10 ),
-                        parseInt( rgb[4], 10 ),
-                        parseInt( rgb[6], 10 ) ];
-            if ( rgb[3] === '%' ) {
-                ret = $.map(ret, function ( m ) { return m * 255 / 100; });
-            }
+            mul = ( rgb[3] === '%' ) ? 2.55 : 1;
+            ret = [ rgb[2] * mul,
+                    rgb[4] * mul,
+                    rgb[6] * mul ];
             if ( rgb[1] && rgb[8] ) {
                 ret.push( parseFloat( rgb[8] ) );
             }
